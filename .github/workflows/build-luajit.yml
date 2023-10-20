@@ -1,0 +1,42 @@
+
+name: build-luajit
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0 * * *"
+
+jobs:
+  build:
+    runs-on: windows-2022
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2          
+
+      - name: build
+        id: build
+        shell: cmd
+        run: call build.cmd
+
+      - name: release
+        id: release
+        if: steps.build.outputs.OUTPUT_DATE != ''
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.build.outputs.OUTPUT_DATE }}
+          release_name: ${{ steps.build.outputs.OUTPUT_DATE }}
+          body: |
+            [LuaJIT commit](https://github.com/LuaJIT/LuaJIT/commit/${{ steps.build.outputs.LuaJIT_COMMIT }})
+
+      - name: upload
+        id: upload
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.release.outputs.upload_url }}
+          asset_path: "LuaJIT-${{ steps.build.outputs.OUTPUT_DATE }}.zip"
+          asset_name: "LuaJIT-${{ steps.build.outputs.OUTPUT_DATE }}.zip"
+          asset_content_type: application/zip
