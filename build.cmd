@@ -40,6 +40,7 @@ pushd %OUTPUT%
 mkdir bin
 mkdir include
 mkdir lib
+mkdir lib\static
 popd
 
 call :clone %SOURCE%       "https://github.com/LuaJIT/LuaJIT"       v2.1 || exit /b 1
