@@ -35,25 +35,41 @@ where /Q cl.exe || (
 set OUTPUT=%~dp0LuaJIT
 set SOURCE=%~dp0Source
 
-call :clone %SOURCE%       "https://github.com/LuaJIT/LuaJIT"       v2.1 || exit /b 1
-
-pushd %SOURCE%
-pushd src
-call msvcbuild.bat
-popd
-popd
-
 if not exist %OUTPUT% mkdir %OUTPUT%
-
 pushd %OUTPUT%
 mkdir bin
 mkdir include
 mkdir lib
 popd
 
-COPY /B /V /Y %SOURCE%\src\lua51.dll  %OUTPUT%\bin\lua51.dll
-COPY /B /V /Y %SOURCE%\src\luajit.exe %OUTPUT%\bin\luajit.exe
+call :clone %SOURCE%       "https://github.com/LuaJIT/LuaJIT"       v2.1 || exit /b 1
 
+REM Build Dynamic Library
+pushd %SOURCE%
+pushd src
+call msvcbuild.bat debug amalg
+popd
+popd
+
+REM Copy Dynamic Library
+COPY /B /V /Y %SOURCE%\src\lua51.dll  %OUTPUT%\bin\lua51.dll
+COPY /B /V /Y %SOURCE%\src\lua51.pdb  %OUTPUT%\bin\lua51.pdb
+COPY /B /V /Y %SOURCE%\src\lua51.lib %OUTPUT%\lib\lua51.lib
+
+REM Build Static Library and Executable
+pushd %SOURCE%
+pushd src
+call msvcbuild.bat debug amalg static
+popd
+popd
+
+REM Copy Static Library and Executable
+COPY /B /V /Y %SOURCE%\src\lua51.lib %OUTPUT%\lib\static\lua51.lib
+COPY /B /V /Y %SOURCE%\src\lua51.pdb %OUTPUT%\lib\static\lua51.pdb
+COPY /B /V /Y %SOURCE%\src\luajit.exe %OUTPUT%\bin\luajit.exe
+COPY /B /V /Y %SOURCE%\src\luajit.pdb %OUTPUT%\bin\luajit.pdb
+
+REM Copy headers
 COPY /B /V /Y %SOURCE%\src\lua.h     %OUTPUT%\include\lua.h
 COPY /B /V /Y %SOURCE%\src\luaconf.h %OUTPUT%\include\luaconf.h
 COPY /B /V /Y %SOURCE%\src\lauxlib.h %OUTPUT%\include\lauxlib.h
@@ -61,7 +77,8 @@ COPY /B /V /Y %SOURCE%\src\lualib.h  %OUTPUT%\include\lualib.h
 COPY /B /V /Y %SOURCE%\src\luajit.h  %OUTPUT%\include\luajit.h
 COPY /B /V /Y %SOURCE%\src\lua.hpp   %OUTPUT%\include\lua.hpp
 
-COPY /B /V /Y %SOURCE%\src\lua51.lib %OUTPUT%\lib\lua51.lib
+REM Copy license
+COPY /B /V /Y %SOURCE%\COPYRIGHT   %OUTPUT%\LICENSE.txt
 
 set /p LuaJIT_COMMIT=<%SOURCE%\.git\refs\heads\v2.1
 
