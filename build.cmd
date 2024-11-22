@@ -60,7 +60,7 @@ COPY /B /V /Y %SOURCE%\src\lua51.lib %OUTPUT%\lib\lua51.lib
 REM Build Static Library and Executable
 pushd %SOURCE%
 pushd src
-call msvcbuild.bat debug static
+call msvcbuild.bat debug amalg static
 popd
 popd
 
