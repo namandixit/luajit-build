@@ -40,7 +40,6 @@ pushd %OUTPUT%
 mkdir bin
 mkdir include
 mkdir lib
-mkdir lib\static
 popd
 
 call :clone %SOURCE%       "https://github.com/LuaJIT/LuaJIT"       v2.1 || exit /b 1
@@ -56,19 +55,6 @@ REM Copy Dynamic Library
 COPY /B /V /Y %SOURCE%\src\lua51.dll  %OUTPUT%\bin\lua51.dll
 COPY /B /V /Y %SOURCE%\src\lua51.pdb  %OUTPUT%\bin\lua51.pdb
 COPY /B /V /Y %SOURCE%\src\lua51.lib %OUTPUT%\lib\lua51.lib
-
-REM Build Static Library and Executable
-pushd %SOURCE%
-pushd src
-call msvcbuild.bat debug amalg static
-popd
-popd
-
-REM Copy Static Library and Executable
-COPY /B /V /Y %SOURCE%\src\lua51.lib %OUTPUT%\lib\static\lua51.lib
-COPY /B /V /Y %SOURCE%\src\lua51.pdb %OUTPUT%\lib\static\lua51.pdb
-COPY /B /V /Y %SOURCE%\src\luajit.exe %OUTPUT%\bin\luajit.exe
-COPY /B /V /Y %SOURCE%\src\luajit.pdb %OUTPUT%\bin\luajit.pdb
 
 REM Copy headers
 COPY /B /V /Y %SOURCE%\src\lua.h     %OUTPUT%\include\lua.h
