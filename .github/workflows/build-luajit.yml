@@ -9,6 +9,10 @@ on:
 jobs:
   build:
     runs-on: windows-2022
+    outputs:
+      OUTPUT_DATE:            ${{ steps.build.outputs.OUTPUT_DATE }}
+      LuaJIT_COMMIT:          ${{ steps.build.outputs.LuaJIT_COMMIT }}
+
     steps:
       - name: checkout
         uses: actions/checkout@v4          
@@ -18,6 +22,14 @@ jobs:
         shell: cmd
         run: call build.cmd
 
+      - name: upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: LuaJIT-${{ steps.build.outputs.OUTPUT_DATE }}
+          path: LuaJIT-${{ steps.build.outputs.OUTPUT_DATE }}.zip
+          if-no-files-found: error
+          compression-level: 0
+  
   release:
     runs-on: ubuntu-24.04
     needs: build
@@ -28,7 +40,7 @@ jobs:
     steps:
       - name: release
         run: |
-            echo '[LuaJIT commit](https://github.com/LuaJIT/LuaJIT/commit/${{ steps.build.outputs.LuaJIT_COMMIT }})'
+            echo '[LuaJIT commit](https://github.com/LuaJIT/LuaJIT/commit/${{ needs.build.outputs.LuaJIT_COMMIT }})'
 
       - name: get artifacts
         uses: actions/download-artifact@v4
