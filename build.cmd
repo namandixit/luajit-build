@@ -56,6 +56,17 @@ COPY /B /V /Y %SOURCE%\src\lua51.dll  %OUTPUT%\bin\lua51.dll
 COPY /B /V /Y %SOURCE%\src\lua51.pdb  %OUTPUT%\bin\lua51.pdb
 COPY /B /V /Y %SOURCE%\src\lua51.lib %OUTPUT%\lib\lua51.lib
 
+REM Build Statically Linked Executable
+pushd %SOURCE%
+pushd src
+call msvcbuild.bat debug static
+popd
+popd
+
+REM Copy Statically Linked Executable
+COPY /B /V /Y %SOURCE%\src\luajit.exe %OUTPUT%\bin\luajit.exe
+COPY /B /V /Y %SOURCE%\src\luajit.pdb %OUTPUT%\bin\luajit.pdb
+
 REM Copy headers
 COPY /B /V /Y %SOURCE%\src\lua.h     %OUTPUT%\include\lua.h
 COPY /B /V /Y %SOURCE%\src\luaconf.h %OUTPUT%\include\luaconf.h
