@@ -1,4 +1,4 @@
-Automatic daily build of [LuaJIT][] for 64-bit Windows.
+On demand build of [LuaJIT][] for 64-bit Windows.
 
 Build produces shared libraries (.dll files).
 
